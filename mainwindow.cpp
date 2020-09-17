@@ -75,13 +75,16 @@ void MainWindow::on_updateAllButton_clicked()
 
     foreach(VescInterface* mVescInterface, mVescInterfaceList) {
 
+        ui->updateLog->insertPlainText("\nPort: ");
+        ui->updateLog->insertPlainText(QString(mVescInterface->getConnectedPortName()));
+        ui->updateLog->insertPlainText(com2usbMap.value(mVescInterface->getConnectedPortName()));
+        ui->updateLog->insertPlainText("\nFirmwareUploadStarted");
+
         bool fwUploadSuccessful = mVescInterface->fwUpload(firmwareData, isBootloader, allOverCan);
 
         if (fwUploadSuccessful) {
 
-            ui->updateLog->insertPlainText("\nPort: ");
-            ui->updateLog->insertPlainText(QString(mVescInterface->getConnectedPortName()));
-            ui->updateLog->insertPlainText(com2usbMap.value(mVescInterface->getConnectedPortName()));
+
             ui->updateLog->insertPlainText("\nFW upload successful: ");
             ui->updateLog->insertPlainText(QString::number(fwUploadSuccessful));
 
@@ -102,7 +105,9 @@ void MainWindow::on_updateAllButton_clicked()
 void MainWindow::on_disconnectAllButton_clicked()
 {
     foreach(VescInterface* mVescInterface, mVescInterfaceList) {
+        ui->disconnectLog->insertPlainText(mVescInterface->getConnectedPortName());
         mVescInterface->disconnectPort();
+        ui->disconnectLog->insertPlainText(": Disconnected");
     }
 
     mVescInterfaceList.clear();
@@ -118,21 +123,12 @@ void MainWindow::on_configAllButton_clicked()
 
     com2usbMap = VescConnection::mapCOM2USB();
 
-    foreach(QString comPortName, com2usbMap.keys()) {
+    foreach(VescInterface* mVescInterface, mVescInterfaceList) {
 
-        QSerialPortInfo comPortInfo = QSerialPortInfo(comPortName);
+            if (mVescInterface->autoconnect()) {
 
-        // Check if Vesc
-
-        if (comPortInfo.manufacturer().startsWith("STMicroelectronics")) {
-
-            VescInterface * mVescInterface = new VescInterface(this);
-
-            if (mVescInterface->connectSerial(comPortInfo.systemLocation())) {
-
-                mVescInterfaceList.append(mVescInterface);
-                ui->configLog->appendPlainText(comPortName);
-                ui->configLog->appendPlainText(com2usbMap.value(comPortName));
+                ui->configLog->appendPlainText(mVescInterface->getConnectedPortName());
+                ui->configLog->appendPlainText(com2usbMap.value(mVescInterface->getConnectedPortName()));
                 ui->configLog->insertPlainText(" connection successful\n ");
 
                 bool mConfLoaded = mVescInterface->mcConfig()->loadXml(mConfigPath, "MCConfiguration");
@@ -162,17 +158,10 @@ void MainWindow::on_configAllButton_clicked()
 
             } else {
 
-                ui->configLog->appendPlainText(comPortName);
-                ui->configLog->appendPlainText(com2usbMap.value(comPortName));
+                //ui->configLog->appendPlainText(comPortName);
+                //ui->configLog->appendPlainText(com2usbMap.value(comPortName));
                 ui->configLog->insertPlainText(" connection failed\n ");
             }
 
-
-        } else {
-
-            ui->connectLog->appendPlainText(comPortName);
-            ui->connectLog->insertPlainText(" Not a VESC\n ");
-
-        }
     }
 }
