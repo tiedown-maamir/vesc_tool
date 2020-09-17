@@ -151,13 +151,15 @@ build_mobile {
     DEFINES += USE_MOBILE
 }
 
-SOURCES += main.cpp\
-        mainwindow.cpp \
+SOURCES +=\
+    main.cpp \
+    mainwindow.cpp \
     packet.cpp \
     vbytearray.cpp \
     commands.cpp \
     configparams.cpp \
     configparam.cpp \
+    vescconnection.cpp \
     vescinterface.cpp \
     parametereditor.cpp \
     digitalfiltering.cpp \
@@ -167,13 +169,15 @@ SOURCES += main.cpp\
     utility.cpp \
     tcpserversimple.cpp
 
-HEADERS  += mainwindow.h \
+HEADERS  += \
+    mainwindow.h \
     packet.h \
     vbytearray.h \
     commands.h \
     datatypes.h \
     configparams.h \
     configparam.h \
+    vescconnection.h \
     vescinterface.h \
     parametereditor.h \
     digitalfiltering.h \
@@ -183,8 +187,8 @@ HEADERS  += mainwindow.h \
     utility.h \
     tcpserversimple.h
 
-FORMS    += mainwindow.ui \
-    parametereditor.ui
+FORMS    += \
+    mainwindow.ui
 
 contains(DEFINES, HAS_BLUETOOTH) {
     SOURCES += bleuart.cpp
