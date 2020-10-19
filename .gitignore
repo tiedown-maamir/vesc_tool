@@ -42,6 +42,9 @@ target_wrapper.*
 # QtCreator CMake
 CMakeLists.txt.user*
 
+# QtCreator User File
+vesc_tool.pro.user
+
 # Other
 android-libvesc_tool.so-deployment-settings.json
 android_release_vesctool.keystore
