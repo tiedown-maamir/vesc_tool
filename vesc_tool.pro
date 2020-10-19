@@ -196,7 +196,8 @@ HEADERS  += \
     tcpserversimple.h
 
 FORMS    += \
-    mainwindow.ui
+    mainwindow.ui \
+    parametereditor.ui
 
 contains(DEFINES, HAS_BLUETOOTH) {
     SOURCES += bleuart.cpp

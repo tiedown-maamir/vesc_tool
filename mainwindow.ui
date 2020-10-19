@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>713</width>
-    <height>582</height>
+    <height>786</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,43 +15,50 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QFormLayout" name="formLayout_2">
-    <item row="1" column="1">
+    <item row="3" column="1">
      <widget class="QPlainTextEdit" name="updateLog"/>
     </item>
-    <item row="1" column="0">
+    <item row="3" column="0">
      <widget class="QPushButton" name="updateAllButton">
       <property name="text">
        <string>Update All</string>
       </property>
      </widget>
     </item>
-    <item row="0" column="0">
+    <item row="2" column="0">
      <widget class="QPushButton" name="connectAllButton">
       <property name="text">
        <string>Connect All</string>
       </property>
      </widget>
     </item>
-    <item row="3" column="0">
+    <item row="5" column="0">
      <widget class="QPushButton" name="disconnectAllButton">
       <property name="text">
        <string>Disconnect All</string>
       </property>
      </widget>
     </item>
-    <item row="0" column="1">
+    <item row="2" column="1">
      <widget class="QPlainTextEdit" name="connectLog"/>
     </item>
-    <item row="3" column="1">
+    <item row="5" column="1">
      <widget class="QPlainTextEdit" name="disconnectLog"/>
     </item>
-    <item row="2" column="1">
+    <item row="4" column="1">
      <widget class="QPlainTextEdit" name="configLog"/>
     </item>
-    <item row="2" column="0">
+    <item row="4" column="0">
      <widget class="QPushButton" name="configAllButton">
       <property name="text">
        <string>Config All</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0" colspan="2">
+     <widget class="QPushButton" name="allButton">
+      <property name="text">
+       <string>Bro Do Everything Bro</string>
       </property>
      </widget>
     </item>

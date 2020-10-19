@@ -29,9 +29,12 @@ private slots:
 
     void on_configAllButton_clicked();
 
+    void on_allButton_clicked();
+
 private:
 
     void configureVesc(VescInterface* mVescInterface);
+    void countDown();
 
     Ui::MainWindow *ui;
 
@@ -41,6 +44,10 @@ private:
     QList<QTimer*> mTimerList;
 
     QMap<QString, QString> com2usbMap;
+
+    QTimer *allTimer = new QTimer(this);
+
+    int reconnectCounter;
 };
 
 #endif // MAINWINDOW_H

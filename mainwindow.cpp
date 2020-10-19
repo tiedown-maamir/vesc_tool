@@ -63,24 +63,31 @@ void MainWindow::on_updateAllButton_clicked()
     bool isBootloader = false;
     bool allOverCan = false;
 
-    QDir firmwareDirectory("C:\\GitHub\\vesc_tool\\res\\firmwares\\60");
+
+    //QString firmwarePath = "C:/GitHub/TranzVoltAssemblyTools/40708 Assembly Wizard/40708AssemblyWizard/res/firmwares/60"; //v4.1
+    QString firmwarePath = "C:\\GitHub\\vesc_tool\\res\\firmwares\\60"; //v5.1
+    QDir firmwareDirectory(firmwarePath);
     QFile file;
     QByteArray firmwareData;
 
-    firmwareDirectory.setCurrent("C:\\GitHub\\vesc_tool\\res\\firmwares\\60");
+    firmwareDirectory.setCurrent(firmwarePath);
 
     file.setFileName("VESC_default.bin");
-    file.open(QIODevice::ReadOnly);
-    firmwareData = file.readAll();
+
+
+    bool fwUploadSuccessful = false;
 
     foreach(VescInterface* mVescInterface, mVescInterfaceList) {
+
+        file.open(QIODevice::ReadOnly);
+        firmwareData = file.readAll();
 
         ui->updateLog->insertPlainText("\nPort: ");
         ui->updateLog->insertPlainText(QString(mVescInterface->getConnectedPortName()));
         ui->updateLog->insertPlainText(com2usbMap.value(mVescInterface->getConnectedPortName()));
         ui->updateLog->insertPlainText("\nFirmwareUploadStarted");
 
-        bool fwUploadSuccessful = mVescInterface->fwUpload(firmwareData, isBootloader, allOverCan);
+        fwUploadSuccessful = mVescInterface->fwUpload(firmwareData, isBootloader, allOverCan);
 
         if (fwUploadSuccessful) {
 
@@ -88,17 +95,19 @@ void MainWindow::on_updateAllButton_clicked()
             ui->updateLog->insertPlainText("\nFW upload successful: ");
             ui->updateLog->insertPlainText(QString::number(fwUploadSuccessful));
 
+            fwUploadSuccessful = false;
+
         } else {
             ui->updateLog->insertPlainText("FW Upload failed.");
         }
 
-        mVescInterface->disconnectPort();
+        file.close();
 
     }
 
     ui->updateLog->insertPlainText("Wait 10 seconds to upload config");
 
-    file.close();
+
 }
 
 
@@ -125,43 +134,58 @@ void MainWindow::on_configAllButton_clicked()
 
     foreach(VescInterface* mVescInterface, mVescInterfaceList) {
 
-            if (mVescInterface->autoconnect()) {
 
-                ui->configLog->appendPlainText(mVescInterface->getConnectedPortName());
-                ui->configLog->appendPlainText(com2usbMap.value(mVescInterface->getConnectedPortName()));
-                ui->configLog->insertPlainText(" connection successful\n ");
+        bool mConfLoaded = mVescInterface->mcConfig()->loadXml(mConfigPath, "MCConfiguration");
+        if (mConfLoaded){
 
-                bool mConfLoaded = mVescInterface->mcConfig()->loadXml(mConfigPath, "MCConfiguration");
-                if (mConfLoaded){
+            ui->configLog->appendPlainText("Motor Configuration Loaded");
+            mVescInterface->commands()->setMcconf();
+            ui->configLog->appendPlainText("Motor Configuration Written Successfully!");
 
-                    ui->configLog->appendPlainText("Motor Configuration Loaded");
-                    mVescInterface->commands()->setMcconf();
-                    ui->configLog->appendPlainText("Motor Configuration Written Successfully!");
+        }
+        else {
+            ui->configLog->appendPlainText("Motor Configuration Can't Be Loaded!");
+        }
 
-                  }
-                else {
-                    ui->configLog->appendPlainText("Motor Configuration Can't Be Loaded!");
-                  }
+        bool appConfLoaded = mVescInterface->appConfig()->loadXml(appConfigPath, "APPConfiguration");
+        if (appConfLoaded){
+            ui->configLog->appendPlainText("App Configuration Loaded");
 
-                bool appConfLoaded = mVescInterface->appConfig()->loadXml(appConfigPath, "APPConfiguration");
-                if (appConfLoaded){
-                    ui->configLog->appendPlainText("App Configuration Loaded");
+            mVescInterface->commands()->setAppConf();
+            ui->configLog->appendPlainText("App Configuration Written Successfully!");
 
-                    mVescInterface->commands()->setAppConf();
-                    ui->configLog->appendPlainText("App Configuration Written Successfully!");
+        }
+        else {
+            ui->configLog->appendPlainText("App Configuration Can't Be Loaded!");
+        }
 
-                  }
-                else {
-                    ui->configLog->appendPlainText("App Configuration Can't Be Loaded!");
-                  }
+    }
+}
+
+void MainWindow::on_allButton_clicked()
+{
+
+    connect(allTimer, &QTimer::timeout, this, &MainWindow::countDown);
+    reconnectCounter = 20;
+
+    on_connectAllButton_clicked();
+    on_updateAllButton_clicked();
+    allTimer->start();
 
 
-            } else {
 
-                //ui->configLog->appendPlainText(comPortName);
-                //ui->configLog->appendPlainText(com2usbMap.value(comPortName));
-                ui->configLog->insertPlainText(" connection failed\n ");
-            }
+}
 
+void MainWindow::countDown() {
+    reconnectCounter--;
+    ui->connectLog->appendPlainText("T minus ");
+    ui->connectLog->appendPlainText(QString::number(reconnectCounter));
+    ui->connectLog->appendPlainText(" seconds to reconnect");
+
+    if (reconnectCounter < 1) {
+        allTimer->stop();
+        on_connectAllButton_clicked();
+        on_configAllButton_clicked();
+        on_disconnectAllButton_clicked();
     }
 }
