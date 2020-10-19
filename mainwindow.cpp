@@ -29,7 +29,10 @@ void MainWindow::on_connectAllButton_clicked()
 
         // Check if Vesc
 
-        if (comPortInfo.manufacturer().startsWith("STMicroelectronics")) {
+        QString driver = "Microsoft";
+        //QString driver = "STMicroelectronics"; //Eng PC
+
+        if (comPortInfo.manufacturer().startsWith(driver)) {
 
             VescInterface * mVescInterface = new VescInterface(this);
 
@@ -165,6 +168,7 @@ void MainWindow::on_configAllButton_clicked()
 void MainWindow::on_allButton_clicked()
 {
 
+    allTimer->setInterval(1000);
     connect(allTimer, &QTimer::timeout, this, &MainWindow::countDown);
     reconnectCounter = 20;
 
